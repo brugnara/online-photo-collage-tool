@@ -1,0 +1,159 @@
+{{define "form"}}
+{{$id := "files-drop"}}
+
+<div class="container">
+  <form method="post">
+
+    <div class="field">
+      <div class="control">
+        <div class="select">
+          <select name="direction">
+            <option selected value="h">Horizontal</option>
+            <option value="v">Vertical</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div id="{{$id}}"></div>
+
+    <br>
+    <div class="field">
+      <div class="control">
+        <button class="button is-primary">Submit</button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<script>
+// (function () {
+// react
+'use strict';
+
+const e = React.createElement;
+
+function Field(props) {
+  return e(
+    'div',
+    { className: 'field' },
+    e(
+      'div',
+      { className: 'control' },
+      props.inner
+    )
+  )
+}
+
+class Uploader extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      count: 1
+    }
+  }
+
+  onClick() {
+    this.setState({
+      count: this.state.count + 1
+    })
+  }
+
+  render() {
+    const files = []
+    for (let i=0;i<this.state.count;i++) {
+      files.push([FileUploader, { key: i }])
+    }
+
+    return e(
+      'div',
+      null,
+      e(
+        Field,
+        {
+          inner: e(
+            'a', {
+              onClick: () => this.onClick(),
+              className: 'button'
+            }, 'Add another file'
+          )
+        },
+      ),
+      ...files.map(f => [e(...f), null])
+    )
+  }
+}
+
+class FileUploader extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      fileName: null
+    }
+  }
+
+  onChange (e) {
+    let name
+    try {
+      name = e.target.files[0].name
+    } catch (e) {
+      console.error(e)
+      return
+    }
+    this.setState({
+      fileName: name
+    })
+  }
+
+  render() {
+    return e(
+      Field,
+      {
+        inner: e(
+          'div',
+          { className: 'file has-name' },
+          e(
+            'label',
+            { className: 'file-label' },
+            e(
+              'input',
+              {
+                className: 'file-input',
+                type: 'file',
+                name: 'file[]',
+                onChange: (e) => this.onChange(e)
+              }
+            ),
+            e(
+              'span',
+              { className: 'file-cta' },
+              e(
+                'span',
+                { className: 'file-icon' },
+                e('i', { className: 'fas fa-upload' })
+              ),
+              e(
+                'span',
+                { className: 'file-label' },
+                'Choose a file...'
+              )
+            ),
+            e(
+              'span',
+              { className: 'file-name' },
+              this.state.fileName || 'No file selected'
+            )
+          )
+        )
+      }
+    )
+  }
+}
+
+// mount
+const domContainer = document.querySelector('#{{$id}}')
+ReactDOM.render(e(Uploader), domContainer)
+// })()
+</script>
+{{end}}

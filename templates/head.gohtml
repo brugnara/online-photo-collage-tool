@@ -1,0 +1,14 @@
+{{define "head"}}
+{{$envDev := "development"}}
+{{$envProd := "production.min"}}
+{{$env := $envDev}}
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link
+    rel="stylesheet"
+    href="/css/bulma.min.css">
+
+  <script src="https://unpkg.com/react@17/umd/react.{{$env}}.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.{{$env}}.js" crossorigin></script>
+</head>
+{{end}}
