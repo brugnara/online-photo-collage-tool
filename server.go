@@ -79,7 +79,6 @@ func indexPost(w http.ResponseWriter, r *http.Request) {
 	// we handle files by hand
 	if r.MultipartForm != nil && r.MultipartForm.File != nil {
 		for _, file := range r.MultipartForm.File[fileField] {
-			// f, err := fhs[0].Open()
 			f, err := file.Open()
 			if err != nil {
 				log.Println(err)
@@ -95,15 +94,15 @@ func indexPost(w http.ResponseWriter, r *http.Request) {
 	// gen image based on validFiles len
 	x := len(validFiles)*(ssize+newSize) + ssize
 	y := newSize + 2*ssize
+
 	if direction == "v" {
 		x, y = y, x
 	}
+
 	log.Println("Image size:", x, y)
 	img := image.NewRGBA(image.Rect(0, 0, x, y))
-	// todo: fill image with scolor
 
 	if !isTransparent {
-		// leave if wanted transparent
 		b, err := hex.DecodeString(scolor)
 		if err != nil {
 			log.Fatal(err)
@@ -119,8 +118,6 @@ func indexPost(w http.ResponseWriter, r *http.Request) {
 	} else {
 		log.Println("Transparent background")
 	}
-	//
-	log.Printf("%T\n", img)
 
 	// todo: allow user to select scaler based on quality
 	scaler := draw.NearestNeighbor
