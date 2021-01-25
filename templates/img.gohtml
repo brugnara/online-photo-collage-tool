@@ -1,2 +1,27 @@
 <!DOCTYPE html>
-<img src="{{.}}">
+<html>
+{{template "head"}}
+<body>
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title">
+          Online photo collage tool
+        </h1>
+        <h2 class="subtitle">
+          Right click to save the image.
+        </h2>
+      </div>
+    </div>
+  </section>
+  <div class="container">
+    <a href="/">Return back</a>
+  </div>
+
+  <div class="container">
+    <img src="{{.}}">
+  </div>
+
+  {{template "footer"}}
+</body>
+</html>

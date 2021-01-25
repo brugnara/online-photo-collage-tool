@@ -13,7 +13,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 
 	uuid "github.com/satori/go.uuid"
 	"golang.org/x/image/draw"
@@ -23,7 +22,7 @@ const (
 	bulmaPath     = "./public/bulma.min.css"
 	fileField     = "file"
 	defaultSize   = 30
-	defaultColor  = "#FFFFFF"
+	defaultColor  = "#FFEB3B"
 	defaultHeight = 300
 	maxSSize      = 100
 )
@@ -71,18 +70,13 @@ func indexPost(w http.ResponseWriter, r *http.Request) {
 	if err != nil || newSize < ssize*2 {
 		newSize = defaultHeight
 	}
-	scolor := strings.Replace(r.FormValue("scolor")+"FF", "#", "", -1)
+	scolor := r.FormValue("scolor")[1:] + "FF"
 	direction := r.FormValue("direction")
-
-	log.Println(ssize, scolor, direction)
-	// todo:
-	//  - read params
-	//  - read file
-	//  - gen && save image
-	//  - return to visualizer
+	isTransparent := r.FormValue("transparent") != ""
 
 	validFiles := []multipart.File{}
 
+	// we handle files by hand
 	if r.MultipartForm != nil && r.MultipartForm.File != nil {
 		for _, file := range r.MultipartForm.File[fileField] {
 			// f, err := fhs[0].Open()
@@ -107,17 +101,23 @@ func indexPost(w http.ResponseWriter, r *http.Request) {
 	log.Println("Image size:", x, y)
 	img := image.NewRGBA(image.Rect(0, 0, x, y))
 	// todo: fill image with scolor
-	// leave if wanted transparent
-	b, err := hex.DecodeString(scolor)
-	if err != nil {
-		log.Fatal(err)
-	}
-	clr := color.RGBA{b[0], b[1], b[2], 0}
-	//
-	for i := 0; i < x; i++ {
-		for j := 0; j < y; j++ {
-			img.Set(i, j, clr)
+
+	if !isTransparent {
+		// leave if wanted transparent
+		b, err := hex.DecodeString(scolor)
+		if err != nil {
+			log.Fatal(err)
 		}
+		log.Println("Not transparent background", b)
+		clr := color.NRGBA{b[0], b[1], b[2], b[3]}
+		//
+		for i := 0; i < x; i++ {
+			for j := 0; j < y; j++ {
+				img.Set(i, j, clr)
+			}
+		}
+	} else {
+		log.Println("Transparent background")
 	}
 	//
 	log.Printf("%T\n", img)
@@ -129,12 +129,16 @@ func indexPost(w http.ResponseWriter, r *http.Request) {
 	for i, f := range validFiles {
 		src, _, err := image.Decode(f)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
+			resError(w, r, err)
 			return
 		}
 		// todo: flip based on direction
 		x0 := i*(newSize+ssize) + ssize
 		y0 := ssize
+		if direction == "v" {
+			x0, y0 = y0, x0
+		}
 		x1 := x0 + newSize
 		y1 := y0 + newSize
 		dr := image.Rect(x0, y0, x1, y1)
@@ -146,17 +150,24 @@ func indexPost(w http.ResponseWriter, r *http.Request) {
 	fileName := fmt.Sprintf("./tmp/%s.png", uuid.NewV4())
 	dstFile, err := os.Create(fileName)
 	if err != nil {
-		log.Fatal(err)
+		resError(w, r, err)
+		return
 	}
 	defer dstFile.Close()
 	// encode as .png to the file
 
 	err = png.Encode(dstFile, img)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		resError(w, r, err)
 	}
 
 	tpls.ExecuteTemplate(w, "img.gohtml", fileName)
+}
+
+func resError(w http.ResponseWriter, r *http.Request, err error) {
+	log.Println(err)
+	http.Redirect(w, r, "/?error=true", http.StatusSeeOther)
 }
 
 func bulmaCSS(w http.ResponseWriter, r *http.Request) {
