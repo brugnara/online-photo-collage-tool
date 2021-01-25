@@ -23,16 +23,40 @@
     </div>
 
     <div class="field">
+      <label class="label">
+        Output size (height if vertical, width if horizontal)
+      </label>
+      <div class="control reduced">
+        <input
+          min="0"
+          class="input"
+          type="number"
+          name="height"
+          value="{{.DefaultHeight}}">
+      </div>
+    </div>
+
+    <div class="field">
       <label class="label">Spacing size</label>
       <div class="control reduced">
-        <input class="input" type="number" name="ssize", value="30">
+        <input
+          class="input"
+          type="number"
+          name="ssize"
+          min="0"
+          max="{{.MaxSSize}}"
+          value="{{.DefaultSize}}">
       </div>
     </div>
 
     <div class="field">
       <label class="label">Spacing color</label>
       <div class="control reduced">
-        <input class="input" type="color" name="scolor">
+        <input
+          class="input"
+          type="color"
+          name="scolor"
+          value="{{.DefaultColor}}">
       </div>
     </div>
 
@@ -143,7 +167,7 @@
                 {
                   className: 'file-input',
                   type: 'file',
-                  name: 'file',
+                  name: '{{.FileField}}',
                   required: true,
                   onChange: (e) => this.onChange(e)
                 }
