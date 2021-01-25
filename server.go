@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -25,7 +26,20 @@ func listen(port string) {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		indexPost(w, r)
+		return
+	}
 	tpls.ExecuteTemplate(w, "index.gohtml", nil)
+}
+
+func indexPost(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		io.WriteString(w, "An error occured :(")
+		return
+	}
+	fmt.Println(r.PostForm)
+	io.WriteString(w, "ciao")
 }
 
 func bulmaCSS(w http.ResponseWriter, r *http.Request) {

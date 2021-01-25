@@ -1,10 +1,17 @@
 {{define "form"}}
 {{$id := "files-drop"}}
 
+<style>
+.reduced {
+  max-width: 100px;
+}
+</style>
+
 <div class="container">
   <form method="post">
 
     <div class="field">
+      <label class="label">Orientation</label>
       <div class="control">
         <div class="select">
           <select name="direction">
@@ -15,13 +22,26 @@
       </div>
     </div>
 
+    <div class="field">
+      <label class="label">Spacing size</label>
+      <div class="control reduced">
+        <input class="input" type="number" name="ssize", value="30">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Spacing color</label>
+      <div class="control reduced">
+        <input class="input" type="color" name="scolor">
+      </div>
+    </div>
+
     <div id="{{$id}}"></div>
 
     <br>
-    <div class="field">
-      <div class="control">
-        <button class="button is-primary">Submit</button>
-      </div>
+    <div class="buttons">
+      <button class="button is-primary">Generate now</button>
+      <a class="button is-link" href="/">Start from scratch</a>
     </div>
 
   </form>
@@ -41,6 +61,7 @@ function Field(props) {
     e(
       'div',
       { className: 'control' },
+      e('label', { className: 'label', }, props.label),
       props.inner
     )
   )
@@ -72,10 +93,11 @@ class Uploader extends React.Component {
       e(
         Field,
         {
+          label: 'Files',
           inner: e(
             'a', {
               onClick: () => this.onClick(),
-              className: 'button'
+              className: 'button is-link'
             }, 'Add another file'
           )
         },
@@ -121,7 +143,8 @@ class FileUploader extends React.Component {
               {
                 className: 'file-input',
                 type: 'file',
-                name: 'file[]',
+                name: 'file',
+                required: true,
                 onChange: (e) => this.onChange(e)
               }
             ),
