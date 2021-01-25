@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -34,11 +33,21 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func indexPost(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		io.WriteString(w, "An error occured :(")
+	// 1 << 20 = 1MB
+	if err := r.ParseMultipartForm(1 << 20); err != nil {
+		log.Fatalln(err)
 		return
 	}
-	fmt.Println(r.PostForm)
+
+	key := "file"
+
+	if r.MultipartForm != nil && r.MultipartForm.File != nil {
+		if fhs := r.MultipartForm.File[key]; len(fhs) > 0 {
+			// f, err := fhs[0].Open()
+			log.Println(fhs)
+		}
+	}
+
 	io.WriteString(w, "ciao")
 }
 

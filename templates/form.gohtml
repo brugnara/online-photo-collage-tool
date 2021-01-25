@@ -8,7 +8,7 @@
 </style>
 
 <div class="container">
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
 
     <div class="field">
       <label class="label">Orientation</label>
@@ -48,135 +48,135 @@
 </div>
 
 <script>
-// (function () {
-// react
 'use strict';
 
-const e = React.createElement;
+(function () {
+  // react
+  const e = React.createElement;
 
-function Field(props) {
-  return e(
-    'div',
-    { className: 'field' },
-    e(
-      'div',
-      { className: 'control' },
-      e('label', { className: 'label', }, props.label),
-      props.inner
-    )
-  )
-}
-
-class Uploader extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      count: 1
-    }
-  }
-
-  onClick() {
-    this.setState({
-      count: this.state.count + 1
-    })
-  }
-
-  render() {
-    const files = []
-    for (let i=0;i<this.state.count;i++) {
-      files.push([FileUploader, { key: i }])
-    }
-
+  function Field(props) {
     return e(
       'div',
-      null,
+      { className: 'field' },
       e(
+        'div',
+        { className: 'control' },
+        e('label', { className: 'label' }, props.label),
+        props.inner
+      )
+    )
+  }
+
+  class Uploader extends React.Component {
+    constructor(props) {
+      super(props)
+      this.state = {
+        count: 1
+      }
+    }
+
+    onClick() {
+      this.setState({
+        count: this.state.count + 1
+      })
+    }
+
+    render() {
+      const files = []
+      for (let i=0;i<this.state.count;i++) {
+        files.push([FileUploader, { key: i }])
+      }
+
+      return e(
+        'div',
+        null,
+        e(
+          Field,
+          {
+            label: 'Files',
+            inner: e(
+              'a', {
+                onClick: () => this.onClick(),
+                className: 'button is-link'
+              }, 'Add another file'
+            )
+          },
+        ),
+        ...files.map(f => [e(...f), null])
+      )
+    }
+  }
+
+  class FileUploader extends React.Component {
+    constructor(props) {
+      super(props)
+      this.state = {
+        fileName: null
+      }
+    }
+
+    onChange (e) {
+      let name
+      try {
+        name = e.target.files[0].name
+      } catch (e) {
+        console.error(e)
+        return
+      }
+      this.setState({
+        fileName: name
+      })
+    }
+
+    render() {
+      return e(
         Field,
         {
-          label: 'Files',
           inner: e(
-            'a', {
-              onClick: () => this.onClick(),
-              className: 'button is-link'
-            }, 'Add another file'
-          )
-        },
-      ),
-      ...files.map(f => [e(...f), null])
-    )
-  }
-}
-
-class FileUploader extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      fileName: null
-    }
-  }
-
-  onChange (e) {
-    let name
-    try {
-      name = e.target.files[0].name
-    } catch (e) {
-      console.error(e)
-      return
-    }
-    this.setState({
-      fileName: name
-    })
-  }
-
-  render() {
-    return e(
-      Field,
-      {
-        inner: e(
-          'div',
-          { className: 'file has-name' },
-          e(
-            'label',
-            { className: 'file-label' },
+            'div',
+            { className: 'file has-name' },
             e(
-              'input',
-              {
-                className: 'file-input',
-                type: 'file',
-                name: 'file',
-                required: true,
-                onChange: (e) => this.onChange(e)
-              }
-            ),
-            e(
-              'span',
-              { className: 'file-cta' },
+              'label',
+              { className: 'file-label' },
               e(
-                'span',
-                { className: 'file-icon' },
-                e('i', { className: 'fas fa-upload' })
+                'input',
+                {
+                  className: 'file-input',
+                  type: 'file',
+                  name: 'file',
+                  required: true,
+                  onChange: (e) => this.onChange(e)
+                }
               ),
               e(
                 'span',
-                { className: 'file-label' },
-                'Choose a file...'
+                { className: 'file-cta' },
+                e(
+                  'span',
+                  { className: 'file-icon' },
+                  e('i', { className: 'fas fa-upload' })
+                ),
+                e(
+                  'span',
+                  { className: 'file-label' },
+                  'Choose a file...'
+                )
+              ),
+              e(
+                'span',
+                { className: 'file-name' },
+                this.state.fileName || 'No file selected'
               )
-            ),
-            e(
-              'span',
-              { className: 'file-name' },
-              this.state.fileName || 'No file selected'
             )
           )
-        )
-      }
-    )
+        }
+      )
+    }
   }
-}
 
-// mount
-const domContainer = document.querySelector('#{{$id}}')
-ReactDOM.render(e(Uploader), domContainer)
-// })()
+  // mount
+  const domContainer = document.querySelector('#{{$id}}')
+  ReactDOM.render(e(Uploader), domContainer)
+})()
 </script>
 {{end}}
