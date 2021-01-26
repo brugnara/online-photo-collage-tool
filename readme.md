@@ -14,7 +14,7 @@ Enjoy
 
 ## Todo
 
-[_] Allow user to select output quality
-[_] Test
-[_] Refactor
-[_] Drain tmp folder
+- [_] Allow user to select output quality
+- [_] Test
+- [_] Refactor
+- [_] Drain tmp folder
